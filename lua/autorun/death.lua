@@ -21,7 +21,7 @@ local MAX_DROPPED_WEAPONS  = 15
 local WEAPON_STAY_DURATION = 15
 
 --
--- On met en cache tous les sons de morts
+-- On met en cache tous les sons de morts.
 --
 local DeathSound = { 
 	Sound("npc_barney.ba_pain01"),
@@ -71,7 +71,7 @@ local function DoPlayerDeath(ply, attacker, dmg)
 	if(ply:GetActiveWeapon():IsValid()) then
 	
 		--
-		-- On prépare la variable qui contiendra notre entité ARME
+		-- On prépare la variable qui contiendra notre entité ARME.
 		--
 		local Weapon = ply:GetActiveWeapon()
 
@@ -82,7 +82,7 @@ local function DoPlayerDeath(ply, attacker, dmg)
 		if Weapon:GetClass() == "weapon_fists" then return end
 
 		--
-		-- Dans un premier temps on jette l'arme que le joueur porte
+		-- Dans un premier temps on jette l'arme que le joueur porte.
 		--
 		ply:DropWeapon(Weapon)			
 
@@ -148,7 +148,7 @@ hook.Add("DoPlayerDeath", "DoPlayerDeath", DoPlayerDeath)
 local function PlayerDeathSound()
 
 	--
-	-- false = on garde le son | true = on supprime le son
+	-- false = on garde le son | true = on supprime le son.
 	--
 	return true
 end 
