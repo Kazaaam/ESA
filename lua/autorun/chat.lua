@@ -1,0 +1,1 @@
+print("<ESA> chat.lua loaded.")

@@ -82,21 +82,42 @@ local function DoPlayerDeath(ply, attacker, dmg)
 		if Weapon:GetClass() == "weapon_fists" then return end
 
 		--
+		-- On stocke les ID des entités des armes jetées, pour savoir
+		-- quelles entités le joueur peut ramasser ou non.
+		-- Les autres informations servent simplement au Debug.
+		--
+		-- Sert à vérifier si une arme jetée au sol a bien été supprimée ou non.
+		--
+		EntOwners[Weapon:EntIndex()] = "death"
+
+		--
+		-- Affichage des informations de Debug dans la console.
+		--
+		print("<ESA> Player "..ply:Nick().." (#"..ply:EntIndex()..") dropped "..Weapon:GetClass().." (#"..Weapon:EntIndex()..")  from death")	
+
+		--
 		-- Dans un premier temps on jette l'arme que le joueur porte.
 		--
-		ply:DropWeapon(Weapon)			
+		ply:DropWeapon(Weapon)
 
 		--
 		-- Puis on crée un timer qui supprimera l'arme jetée que portait
 		-- le joueur au moment où il est mort.
 		--
-		timer.Create( "del_"..Weapon:EntIndex(), WEAPON_STAY_DURATION, 1, function() 
+		timer.Create("del_"..Weapon:EntIndex(), WEAPON_STAY_DURATION, 1, function() 
 
 			if Weapon:IsValid() then
+
 				--
 				-- On supprime l'entité ARME à la fin du timer.
 				--
 				Weapon:Remove()
+
+				--
+				-- Lorsque l'entité est supprimée, on supprime également 
+				-- son ID stocké pour le libérer.
+				--
+				EntOwners[Weapon:EntIndex()] = nil 
 			end
 
 		end)
@@ -106,7 +127,19 @@ local function DoPlayerDeath(ply, attacker, dmg)
 		-- joueur soient jetées. Mais pour ça il faut parcourir tout son
 		-- inventaire et sélectionner les armes une à une pour les jeter.
 		--
-		for key, wep in pairs(ply:GetWeapons()) do							
+		for key, wep in pairs(ply:GetWeapons()) do			
+
+			--
+			-- On stocke les ID des entités des armes jetées, pour savoir
+			-- quelles entités le joueur peut ramasser ou non.
+			-- On stocke la cause du drop en valeur du tableau. 
+			--
+			EntOwners[wep:EntIndex()] = "death"
+
+			--
+			-- Affichage des informations de Debug dans la console.
+			--			
+			print("<ESA> Player "..ply:Nick().." (#"..ply:EntIndex()..") dropped "..wep:GetClass().." (#"..wep:EntIndex()..") from death")		
 
 			--
 			-- On jette également les armes non visibles à l'écran.
@@ -116,15 +149,28 @@ local function DoPlayerDeath(ply, attacker, dmg)
 			--
 			-- Sans oublier le timer qui supprimera toutes les armes au sol.
 			--
-			timer.Create( "del_"..wep:EntIndex(), WEAPON_STAY_DURATION, 1, function() 
+			timer.Create("del_"..wep:EntIndex(), WEAPON_STAY_DURATION, 1, function() 
+
 				if wep:IsValid() then
+
+					--
+					-- On supprime l'entité ARME à la fin du timer.
+					--
 					wep:Remove()
+
+					--
+					-- Lorsque l'entité est supprimée, on supprime également 
+					-- son ID stocké pour le libérer.
+					--
+					EntOwners[wep:EntIndex()] = nil 
 				end
+
 			end)
 
 			--
 			-- Si on atteint le nombre maximum autorisé d'armes jetées 
-			-- simultanément, on sort de la boucle.
+			-- simultanément, on sort de la boucle pour arrêter de jeter
+			-- des armes.
 			--
 			if key == MAX_DROPPED_WEAPONS then return end
 				
@@ -132,15 +178,8 @@ local function DoPlayerDeath(ply, attacker, dmg)
 
 	end	
 
-
 end
-
---
--- On ajoute un hook "DoPlayerDeath" dans le jeu, qui exécutera
--- la fonction DoPlayerDeath ci-dessus à chaque mort d'un joueur.
---
-hook.Add("DoPlayerDeath", "DoPlayerDeath", DoPlayerDeath)
-
+hook.Add("DoPlayerDeath", "ESA:DoPlayerDeath", DoPlayerDeath)
 
 --
 -- Suppression du son par défaut de la mort (beep-beeeep-beee...)
@@ -152,14 +191,9 @@ local function PlayerDeathSound()
 	--
 	return true
 end 
-
---
--- On ajoute le hook "PlayerDeathSound" qui exécutera la fonction
--- PlayerDeathSound à chaque mort du joueur.
---
-hook.Add("PlayerDeathSound", "PlayerDeathSound", PlayerDeathSound)
+hook.Add("PlayerDeathSound", "ESA:PlayerDeathSound", PlayerDeathSound)
 
 --
 -- Affichage du message de chargement dans la console.
 --
-print("-- ESA: death.lua loaded.")
+print("<ESA> death.lua loaded.")

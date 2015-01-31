@@ -7,7 +7,7 @@
 -- Définit en secondes combien de temps les armes jetées restent au sol
 -- avant d'être supprimées.
 --
-local WEAPON_STAY_DURATION = 60
+local WEAPON_STAY_DURATION = 10
 
 --
 -- Fonction qui permet de jeter l'arme portée actuellement
@@ -26,26 +26,43 @@ local function dropWeapon(ply)
 	--
 	if Weapon:GetClass() == "weapon_fists" then return end
 
-	--
-	-- On jette l'arme portée par le joueur.
-	--
-	ply:DropWeapon(Weapon)
+		--
+		-- On stocke l'ID de l'entité ARME jetée.
+		-- Les autres informations servent au Debug.
+		EntOwners[Weapon:EntIndex()] = "drop"
 
-	--
-	-- Puis on crée un timer qui supprimera l'arme jetée que portait
-	-- le joueur au moment où il est mort.
-	--
-	timer.Create( "del_"..Weapon:EntIndex(), WEAPON_STAY_DURATION, 1, function() 
+		--
+		-- Affichage des informations de Debug dans la console.
+		--			
+		print("<ESA> Player "..ply:Nick().." (#"..ply:EntIndex()..") dropped "..Weapon:GetClass().." (#"..Weapon:EntIndex()..") from drop cmd")		
+
+		--
+		-- On jette l'arme portée par le joueur.
+		--
+		ply:DropWeapon(Weapon)
+
+		--
+		-- Puis on crée un timer qui supprimera l'arme jetée que portait
+		-- le joueur au moment où il est mort.
+		--
+		timer.Create("del_"..Weapon:EntIndex(), WEAPON_STAY_DURATION, 1, function() 
 
 		--
 		-- On vérifie que l'arme est une entité valide et qu'elle 
 		-- existe avant de la supprimer.
 		--
 		if Weapon:IsValid() then
+
 			--
 			-- On supprime l'entité ARME à la fin du timer.
 			--
 			Weapon:Remove()
+
+			--
+			-- Et on supprime l'ID de la liste des entités ARMES
+			-- jetées.
+			--
+			EntOwners[Weapon:EntIndex()] = nil
 		end
 
 	end)	
@@ -57,7 +74,8 @@ end
 concommand.Add("drop", function(ply, cmd)
 
 	--
-	-- On exécute la fonction qui va jeter l'arme.
+	-- On exécute la fonction qui va jeter l'arme lors qu'on entre
+	-- la commande "drop" dans la console.
 	--
 	dropWeapon(ply)
 end)
@@ -66,7 +84,7 @@ end)
 -- Ajout du hook qui exécutera le code qu'il contient lorsque
 -- le joueur va envoyer un message dans le Chat.
 --
-hook.Add( "PlayerSay", "c_DropCmd", function(ply, text, public)
+hook.Add("PlayerSay", "c_DropCmd", function(ply, text, public)
 	
 	--
 	-- On met le texte en minuscules pour éviter les problèmes de
@@ -95,4 +113,4 @@ end )
 --
 -- Affichage du message de chargement dans la console.
 --
-print("-- ESA: drop.lua loaded.")
+print("<ESA> ESA: drop.lua loaded.")
