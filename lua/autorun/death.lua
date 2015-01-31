@@ -18,7 +18,7 @@ local MAX_DROPPED_WEAPONS  = 30
 -- Définit en secondes combien de temps les armes jetées restent au sol
 -- avant d'être supprimées.
 --
-local WEAPON_STAY_DURATION = 15
+local WEAPON_STAY_DURATION = 20
 
 --
 -- On met en cache tous les sons de morts.

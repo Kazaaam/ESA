@@ -7,7 +7,7 @@
 -- Définit en secondes combien de temps les armes jetées restent au sol
 -- avant d'être supprimées.
 --
-local WEAPON_STAY_DURATION = 10
+local WEAPON_STAY_DURATION = 60
 
 --
 -- Fonction qui permet de jeter l'arme portée actuellement
