@@ -29,7 +29,7 @@ local function dropWeapon(ply)
 		--
 		-- On stocke l'ID de l'entité ARME jetée.
 		-- Les autres informations servent au Debug.
-		EntOwners[Weapon:EntIndex()] = "drop"
+		DroppedEnt[Weapon:EntIndex()] = "drop"
 
 		--
 		-- Affichage des informations de Debug dans la console.
@@ -57,12 +57,6 @@ local function dropWeapon(ply)
 			-- On supprime l'entité ARME à la fin du timer.
 			--
 			Weapon:Remove()
-
-			--
-			-- Et on supprime l'ID de la liste des entités ARMES
-			-- jetées.
-			--
-			EntOwners[Weapon:EntIndex()] = nil
 		end
 
 	end)	
@@ -113,4 +107,4 @@ end )
 --
 -- Affichage du message de chargement dans la console.
 --
-print("<ESA> ESA: drop.lua loaded.")
+print("<ESA> drop.lua loaded.")

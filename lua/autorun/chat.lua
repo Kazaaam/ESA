@@ -1,1 +1,1 @@
-print("<ESA> chat.lua loaded.")
+print("<ESA> chat.lua loaded")

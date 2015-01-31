@@ -7,12 +7,12 @@
 -- Définit le nombre maximum d'armes jetées lors de la mort du joueur.
 -- Evite de générer beaucoup de lag si le joueur porte beaucoup d'armes.
 --
--- Au-delà de 15 armes pouvant être jetées simultanément, le jeu commence
+-- Au-delà de 30 armes pouvant être jetées simultanément, le jeu commence
 -- à lagger pour tous les joueurs présents sur le serveur.
 --
 -- Ne pas augmenter ce nombre, sauf si vous savez ce que vous faites.
 --
-local MAX_DROPPED_WEAPONS  = 15 
+local MAX_DROPPED_WEAPONS  = 30
 
 --
 -- Définit en secondes combien de temps les armes jetées restent au sol
@@ -88,7 +88,7 @@ local function DoPlayerDeath(ply, attacker, dmg)
 		--
 		-- Sert à vérifier si une arme jetée au sol a bien été supprimée ou non.
 		--
-		EntOwners[Weapon:EntIndex()] = "death"
+		DroppedEnt[Weapon:EntIndex()] = "death"
 
 		--
 		-- Affichage des informations de Debug dans la console.
@@ -112,12 +112,6 @@ local function DoPlayerDeath(ply, attacker, dmg)
 				-- On supprime l'entité ARME à la fin du timer.
 				--
 				Weapon:Remove()
-
-				--
-				-- Lorsque l'entité est supprimée, on supprime également 
-				-- son ID stocké pour le libérer.
-				--
-				EntOwners[Weapon:EntIndex()] = nil 
 			end
 
 		end)
@@ -134,7 +128,7 @@ local function DoPlayerDeath(ply, attacker, dmg)
 			-- quelles entités le joueur peut ramasser ou non.
 			-- On stocke la cause du drop en valeur du tableau. 
 			--
-			EntOwners[wep:EntIndex()] = "death"
+			DroppedEnt[wep:EntIndex()] = "death"
 
 			--
 			-- Affichage des informations de Debug dans la console.
@@ -147,6 +141,11 @@ local function DoPlayerDeath(ply, attacker, dmg)
 			ply:DropWeapon(wep)
 
 			--
+			-- Désactivation des collisions sur les armes afin d'éviter le lag.
+			--
+			wep:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
+
+			--
 			-- Sans oublier le timer qui supprimera toutes les armes au sol.
 			--
 			timer.Create("del_"..wep:EntIndex(), WEAPON_STAY_DURATION, 1, function() 
@@ -157,12 +156,6 @@ local function DoPlayerDeath(ply, attacker, dmg)
 					-- On supprime l'entité ARME à la fin du timer.
 					--
 					wep:Remove()
-
-					--
-					-- Lorsque l'entité est supprimée, on supprime également 
-					-- son ID stocké pour le libérer.
-					--
-					EntOwners[wep:EntIndex()] = nil 
 				end
 
 			end)
@@ -196,4 +189,4 @@ hook.Add("PlayerDeathSound", "ESA:PlayerDeathSound", PlayerDeathSound)
 --
 -- Affichage du message de chargement dans la console.
 --
-print("<ESA> death.lua loaded.")
+print("<ESA> death.lua loaded")

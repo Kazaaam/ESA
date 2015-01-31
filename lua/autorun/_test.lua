@@ -10,7 +10,7 @@ hook.Add( "PlayerSay", "c_TetstCmd", function(ply, text, public)
 
 	if string.sub(text, 1) == ".test" then
 			
-		for key, value in pairs(EntOwners) do 
+		for key, value in pairs(DroppedEnt) do 
 			PrintMessage(HUD_PRINTTALK, key.."--"..value) 
 		end
 
@@ -24,7 +24,7 @@ hook.Add( "PlayerSay", "c_ResetCmd", function(ply, text, public)
 
 	if string.sub(text, 1) == ".reset" then
 
-		EntOwners = {}
+		DroppedEnt = {}
 
 		return false
 	end

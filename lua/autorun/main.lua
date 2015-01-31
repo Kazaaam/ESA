@@ -17,7 +17,7 @@ local function Initialize()
 	-- Déclaration d'une variable Tableau globale (utilisable)
 	-- par n'importe quel fichier Lua.
 	--
-	EntOwners = {}
+	DroppedEnt = {}
 
 end
 hook.Add("Initialize", "ESA:Initialize", Initialize)
@@ -31,7 +31,7 @@ local function PlayerCanPickupWeapon(ply, wep)
 	--
 	-- On parcourt tout le tableau des entités jetées au sol.
 	--
-	for key, val in pairs(EntOwners) do		
+	for key, val in pairs(DroppedEnt) do		
 		
 		--
 		-- Si l'ID de l'entité est stocké dans le tableau des
@@ -62,7 +62,7 @@ local function PlayerCanPickupWeapon(ply, wep)
 				-- Et on supprime l'ID de la liste des entités ARMES
 				-- jetées.
 				--
-				EntOwners[wep:EntIndex()] = nil
+				DroppedEnt[wep:EntIndex()] = nil
 			end
 
 		end
@@ -75,3 +75,36 @@ local function PlayerCanPickupWeapon(ply, wep)
    return true
 end
 hook.Add("PlayerCanPickupWeapon", "ESA:PlayerCanPickupWeapon", PlayerCanPickupWeapon)
+
+
+--
+-- Fonction qui va vérifier à chaque suppression d'entité, si cette dernière
+-- est dans la liste des entités jetées par le joueur.
+--
+local function EntityRemoved(ent)
+
+	--
+	-- Pour une raison qui m'échappe, parfois EntIndex retourn -1, ce qui
+	-- sert à rien, donc on sort de la fonction.
+	--
+	if ent:EntIndex() == -1 then return end
+
+	--
+	-- On va chercher si l'entité fait partie des entités jetées par le joueur,
+	-- si c'est le cas, on la supprime du tableau.
+	--
+	for key, val in pairs(DroppedEnt) do
+		
+		if ent:EntIndex() == key then
+			DroppedEnt[key] = nil
+		end
+
+	end
+
+end
+hook.Add("EntityRemoved", "ESA:EntityRemoved", EntityRemoved)
+
+--
+--
+--
+print("<ESA> main.lua loaded")
