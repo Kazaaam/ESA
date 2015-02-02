@@ -12,18 +12,18 @@
 --
 -- Ne pas augmenter ce nombre, sauf si vous savez ce que vous faites.
 --
-local MAX_DROPPED_WEAPONS  = 30
+local MAX_DROPPED_WEAPONS  = 50
 
 --
 -- Définit en secondes combien de temps les armes jetées restent au sol
 -- avant d'être supprimées.
 --
-local WEAPON_STAY_DURATION = 20
+local WEAPON_STAY_DURATION = 60
 
 --
 -- On met en cache tous les sons de morts.
 --
-local DeathSound = { 
+local MaleDeathSounds = { 
 	Sound("npc_barney.ba_pain01"),
 	Sound("npc_barney.ba_pain02"),
 	Sound("npc_barney.ba_pain03"),
@@ -44,23 +44,87 @@ local DeathSound = {
 	Sound("*vo/npc/male01/pain09.wav")
 }
 
+local FemaleDeathSounds = {
+	Sound("*vo/npc/female01/pain02.wav"),
+	Sound("*vo/npc/female01/pain03.wav"),
+	Sound("*vo/npc/female01/pain04.wav"),
+	Sound("*vo/npc/female01/pain05.wav"),
+	Sound("*vo/npc/female01/pain06.wav"),
+	Sound("*vo/npc/female01/pain07.wav"),
+	Sound("*vo/npc/female01/pain08.wav"),
+	Sound("*vo/npc/female01/pain09.wav"),
+	Sound("npc_alyx.hurt04"),
+	Sound("npc_alyx.hurt05"),
+	Sound("npc_alyx.hurt06"),
+	Sound("npc_alyx.hurt08")
+}
+
+--
+-- On sélectionne les noms des modèles féminins.
+--
+local FemaleModels = {
+	"alyx",
+	"chell",
+	"female",
+	"medic10",
+	"medic11",
+	"medic12",
+	"medic13",
+	"medic14",
+	"medic15",	
+	"mossman"
+}
+
+--
+-- Fonction qui va jouer le son de la mort 
+--
+local function PlayDeathSound(ply)
+
+	--
+	-- Par défaut on détermine le modèle du joueur à MALE.
+	--
+	local genre = "male" -- par défaut
+
+	--
+	-- On vérifie si le modèle du joueur est féminin ou masculin.
+	--
+	for key, val in pairs(FemaleModels) do
+		
+		if string.match(ply:GetModel(), val) then
+			genre = "female"
+		end
+
+	end
+
+	--
+	-- Selon le sexe du modèle du joueur, on joue le son approprié.
+	--
+	if genre == "female" then
+
+		--
+		-- On sélectionne un nombre aléatoire afin de jouer un son
+		-- différent à chaque mort.
+		--
+		rndSound = math.random(1, 12)
+
+		--
+		-- Et on joue le son.
+		--
+		ply:EmitSound(FemaleDeathSounds[rndSound])
+	else
+	    rndSound = math.random(1, 18)
+		ply:EmitSound(MaleDeathSounds[rndSound])
+	end
+
+end
+
 --
 -- On exécute le script suivant lorsque le joueur meurt.
 --
 local function DoPlayerDeath(ply, attacker, dmg)
 
-	--
-	-- On sélectionne aléatoirement un nombre afin de jouer un 
-	-- son différent à chaque mort, 18 étant le nombre maximum 
-	-- de sons en cache.
-	--
-	rndSound = math.random(1, 18)
-
-	--
-	-- On sélectionne le son en cache et on le joue selon le 
-	-- nombre aléatoire généré.
-	--
-	ply:EmitSound(DeathSound[rndSound])
+	
+	PlayDeathSound(ply)
 
 	--
 	-- On vérifie que l'arme que porte le joueur est jetable :
@@ -93,7 +157,7 @@ local function DoPlayerDeath(ply, attacker, dmg)
 		--
 		-- Affichage des informations de Debug dans la console.
 		--
-		print("<ESA> Player "..ply:Nick().." (#"..ply:EntIndex()..") dropped "..Weapon:GetClass().." (#"..Weapon:EntIndex()..")  from death")	
+		print("<ESA> Player "..ply:Nick().." (#"..ply:EntIndex()..") dropped "..Weapon:GetClass().." (#"..Weapon:EntIndex()..") from death")	
 
 		--
 		-- Dans un premier temps on jette l'arme que le joueur porte.
@@ -143,7 +207,12 @@ local function DoPlayerDeath(ply, attacker, dmg)
 			--
 			-- Désactivation des collisions sur les armes afin d'éviter le lag.
 			--
-			wep:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
+			wep:SetCollisionGroup(COLLISION_GROUP_WORLD)
+
+			--
+			-- On modifie le poids des armes pour que la chute soit plus réaliste.
+			--
+			wep:GetPhysicsObject():SetMass(300)
 
 			--
 			-- Sans oublier le timer qui supprimera toutes les armes au sol.

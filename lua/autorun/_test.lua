@@ -11,7 +11,7 @@ hook.Add( "PlayerSay", "c_TetstCmd", function(ply, text, public)
 	if string.sub(text, 1) == ".test" then
 			
 		for key, value in pairs(DroppedEnt) do 
-			PrintMessage(HUD_PRINTTALK, key.."--"..value) 
+			PrintMessage(HUD_PRINTTALK, key.." on "..value) 
 		end
 
 		return false
@@ -70,5 +70,66 @@ hook.Add( "PlayerSay", "chatSounds", function(ply, text, public)
 	end
 
 end)
+
+
+
+
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+--
+--			ZONE DANGEREUSE !!
+--
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+
+-- local function PlayerUse(ply, ent)
+	
+-- 	print("USE")
+-- 	-- local AimedWeapon = ply:GetEyeTrace():GetEntity():GetClass()
+
+-- 	return true	
+-- end
+-- hook.Add("PlayerUse", "PlayerUse", PlayerUse)
+
+-- hook.Add( "Tick", "ESA:KeyDownUse", function(ply)
+
+-- 	print(ply:Nick())
+
+-- end)
+
+local function KeyPress(ply, key)
+
+
+	if (key == IN_USE) then
+
+		local ent = ply:GetEyeTrace().Entity
+
+		if ent:IsWeapon() && !ply:HasWeapon(ent:GetClass()) then
+			ply:Give(ent:GetClass())
+		end
+
+	end	
+
+		-- local ent =  ply:GetEyeTrace().Entity
+
+		-- if ent:IsWeapon() && !ply:HasWeapon(ent:GetClass()) then
+		--     ply:Give(ent:GetClass())
+		-- end	
+
+
+
+		
+		-- if ent:IsWeapon() and !ply:HasWeapon(ent:GetClass()) then
+		-- 	ply:Give(ent:GetClass())
+		-- 	print("Tried to get : "..ent:GetClass())
+		-- 	DroppedEnt[ent:EntIndex()] = nil
+		-- 	ent:Remove()
+		-- end
+
+		
+
+	
+end
+hook.Add("KeyPress", "KeyPress", KeyPress)
 
 print("<ESA> _test.lua loaded.")
